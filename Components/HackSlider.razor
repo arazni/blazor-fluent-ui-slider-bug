@@ -1,0 +1,10 @@
+﻿@inherits FluentSlider<int>
+
+@{
+	base.BuildRenderTree(__builder);
+}
+
+@code {
+	public void ExposeStateHasChanged() => this.StateHasChanged();
+	public void Reset() => this.Value = 0;
+}

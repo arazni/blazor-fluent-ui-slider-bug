@@ -1,0 +1,95 @@
+﻿@page "/"
+@using SliderTest.Components
+
+<PageTitle>Home</PageTitle>
+
+<div>
+	<p>This test demonstrates that the FluentSlider's two-way data binding is broken in version 4.4.0.</p>
+
+	<p>In my web app, I have a component that requires a slider reaches its max value, enabling a selection field, and then after a selection is made, a button triggers a command and this command also resets the value of the slider to 0.</p>
+
+	<p>That above behavior is not working in Fluent UI. (It was working in MudBlazor, but I am rewriting the app with your library for screen reader support.)</p>
+
+	<p>I've prepared a demo of the problematic behaviors.</p>
+
+	<p>Go ahead and max out the slider, which will enable the reset button. The expected behavior is for the reset button to set the value back to 0, and for the slider component to reflect that value.</p>
+
+	<FluentSlider @ref=FluentSlider @bind-Value="FluentModel.DataValue" Min="0" Max="Model.MaxValue" Step="1" Class="slider-test">
+		@foreach (var i in Enumerable.Range(0, Model.MaxValue + 1))
+		{
+			<FluentSliderLabel Position="i">@i</FluentSliderLabel>
+		}
+	</FluentSlider>
+
+	<FluentButton OnClick="FluentReset" Disabled="Model.MaxValue != FluentModel.DataValue">Reset</FluentButton>
+
+	<p>You can see in the console logs that the data model's value is reset to 0, however the slider's value is kept at 3 both visibly and under the hood. This implies that it isn't respecting the binding.</p>
+
+	<p>Sometimes, to force Fluent UI Blazor components to behave how I want them to, I will create an inheriting component that exposes the StateHasChanged() method.</p>
+
+	<p>The expected behavior would be that forcing StateHasChanged() to be called would update the component. It does not.</p>
+
+	<HackSlider @ref=HackSlider @bind-Value="HackModel.DataValue" Min="0" Max="Model.MaxValue" Step="1" Class="slider-test">
+		@foreach (var i in Enumerable.Range(0, Model.MaxValue + 1))
+		{
+			<FluentSliderLabel Position="i">@i</FluentSliderLabel>
+		}
+	</HackSlider>
+
+	<FluentButton OnClick="HackReset" Disabled="Model.MaxValue != HackModel.DataValue">Reset</FluentButton>
+
+	<p>Calling StateHasChanged() does not cause the underlying SliderValue to respect the expected change.</p>
+
+	<p>As a final test, I will reset the SliderValue within the custom hacky component.</p>
+
+	<HackSlider @ref=Hack2Slider @bind-Value="Hack2Model.DataValue" Min="0" Max="Model.MaxValue" Step="1" Class="slider-test">
+		@foreach (var i in Enumerable.Range(0, Model.MaxValue + 1))
+		{
+			<FluentSliderLabel Position="i">@i</FluentSliderLabel>
+		}
+	</HackSlider>
+
+	<FluentButton OnClick="Hack2Reset" Disabled="Model.MaxValue != Hack2Model.DataValue">Reset</FluentButton>
+
+	<p>Here we see that despite reseting both the Blazor component and the underlying data model to 0, the slider component is still visually stuck at its maximum value.</p>
+
+	<p>Please fix.</p>
+
+	<p>Arazni</p>
+
+</div>
+
+@code {
+	Model FluentModel { get; set; } = new();
+
+	Model HackModel { get; set; } = new();
+
+	Model Hack2Model { get; set; } = new();
+
+	FluentSlider<int>? FluentSlider { get; set; }
+
+	HackSlider? HackSlider { get; set; }
+
+	HackSlider? Hack2Slider { get; set; }
+
+	void FluentReset()
+	{
+		FluentModel.Reset();
+		Console.WriteLine("Slider Value: " + FluentSlider!.Value);
+	}
+
+	void HackReset()
+	{
+		HackModel.Reset();
+		HackSlider!.ExposeStateHasChanged();
+		Console.WriteLine("Hack Value: " + HackSlider!.Value);
+	}
+
+	void Hack2Reset()
+	{
+		Hack2Model.Reset();
+		Hack2Slider!.Reset();
+		Hack2Slider!.ExposeStateHasChanged();
+		Console.WriteLine("Hack 2 Value: " + Hack2Slider!.Value);
+	}
+}

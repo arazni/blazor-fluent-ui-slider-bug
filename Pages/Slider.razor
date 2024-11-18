@@ -25,6 +25,8 @@
 
 	<FluentButton OnClick="FluentReset" Disabled="Model.MaxValue != FluentModel.DataValue">Reset</FluentButton>
 
+	<FluentButton OnClick="FluentChangeBy2">Change by 2</FluentButton>
+
 	<p>You can see in the console logs that the data model's value is reset to 0, however the slider's value is kept at 3 both visibly and under the hood. This implies that it isn't respecting the binding.</p>
 
 	<p>Sometimes, to force Fluent UI Blazor components to behave how I want them to, I will create an inheriting component that exposes the StateHasChanged() method.</p>
@@ -77,6 +79,12 @@
 	void FluentReset()
 	{
 		FluentModel.Reset();
+		Console.WriteLine("Slider Value: " + FluentSlider!.Value);
+	}
+
+	void FluentChangeBy2()
+	{
+		FluentModel.ChangeBy2();
 		Console.WriteLine("Slider Value: " + FluentSlider!.Value);
 	}
 

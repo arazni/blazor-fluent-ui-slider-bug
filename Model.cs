@@ -11,4 +11,14 @@ public class Model
 		DataValue = 0;
 		Console.WriteLine("Data Value: " + DataValue);
 	}
+
+	public void ChangeBy2()
+	{
+		if (DataValue < 2)
+			DataValue += 2;
+		else
+			DataValue -= 2;
+
+		Console.WriteLine("Data Value: " + DataValue);
+	}
 }
